@@ -1,0 +1,67 @@
+[gd_scene load_steps=5 format=3 uid="uid://vuavb6iox63y"]
+
+[ext_resource type="Script" path="res://board.gd" id="1_fojx7"]
+[ext_resource type="Script" path="res://main.gd" id="1_i5bht"]
+[ext_resource type="Texture2D" uid="uid://1sql4pmy32c8" path="res://assets/BPawn.svg" id="2_786bw"]
+[ext_resource type="PackedScene" uid="uid://dfs6hxmk5w8at" path="res://square.tscn" id="2_w34se"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("board")]
+script = ExtResource("1_i5bht")
+board = NodePath("board")
+enemy_texture = ExtResource("2_786bw")
+
+[node name="board" type="GridContainer" parent="."]
+layout_direction = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 700.0
+offset_top = 355.0
+offset_right = 2235.0
+offset_bottom = 1891.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(3, 3)
+columns = 8
+script = ExtResource("1_fojx7")
+square_scene = ExtResource("2_w34se")
+
+[node name="ScoreLabel" type="Label" parent="."]
+layout_direction = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 1017.0
+offset_top = -6.0
+offset_right = 1167.0
+offset_bottom = 34.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(4, 4)
+text = "Score : 0"
+horizontal_alignment = 1
+
+[node name="SelectedPiece" type="Label" parent="."]
+offset_left = 2161.0
+offset_top = -1.0
+offset_right = 2329.0
+offset_bottom = 24.0
+scale = Vector2(4, 4)
+text = "Selected Piece: none"
+
+[node name="Available" type="Label" parent="."]
+offset_left = 17.0
+offset_top = 98.0
+offset_right = 106.0
+offset_bottom = 251.0
+scale = Vector2(4, 4)
+text = "\"knight\": 2,
+\"rook\": 2,
+\"bishop\": 2,
+\"queen\": 2,
+\"king\": 1,
+	\"pawn\": 8"
