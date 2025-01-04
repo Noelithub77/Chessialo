@@ -13,8 +13,6 @@ var original_colors = {}
 
 func _ready():
 	create_grid()
-	print("board's _ready")
-	#_on_square_pressed(Vector2(6,6))
 
 func create_grid():
 	for row in range(board_size):
