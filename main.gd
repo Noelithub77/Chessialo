@@ -52,9 +52,6 @@ func spawn_enemy():
 func _process(_delta):
 	if Input.is_action_just_pressed("use_piece"):
 		get_piece()
-	# var is_pressed = board.is_square_pressed(Vector2(0,0))
-	# if is_pressed:
-	# 	print("Button is pressed!")
 
 func get_piece():
 	for key in piece_types.keys():
@@ -79,6 +76,7 @@ func get_piece():
 func _on_square_clicked(grid_pos: Vector2):
 	if active_piece_type != "none":
 		place_piece(grid_pos)
+		board.clear_highlights()
 
 func place_piece(grid_pos : Vector2):
 	if !board.occupied_squares.get(grid_pos, false):

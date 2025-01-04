@@ -8,6 +8,8 @@ var board_size = 8
 var occupied_squares = {}
 var occupied_by_piece = {}
 var preview_opacity = 0.5
+var highlight_color = Color(0.2, 0.8, 0.2, 0.3)  # Semi-transparent green
+var original_colors = {}
 
 func _ready():
 	create_grid()
@@ -47,16 +49,38 @@ func get_square(grid_pos: Vector2):
 		return grid[index]
 	return null
 
+func highlight_squares(positions: Array[Vector2]):
+	clear_highlights()
+	for pos in positions:
+		var square = get_square(pos)
+		if square:
+			var color_rect = square.get_node("ColorRect")
+			original_colors[pos] = color_rect.color
+			color_rect.color = highlight_color
+
+func clear_highlights():
+	for pos in original_colors.keys():
+		var square = get_square(pos)
+		if square:
+			var color_rect = square.get_node("ColorRect")
+			color_rect.color = original_colors[pos]
+	original_colors.clear()
+
 func _on_button_mouse_entered(grid_pos: Vector2):
 	var square = get_square(grid_pos)
-	if square and !occupied_squares[grid_pos]:
-		var texture_rect = square.get_node("ColorRect/ContentTextureRect")
-		# Get the owner (main scene) to access the active piece and textures
+	if square:
 		var main = get_tree().get_root().get_node("Main")
 		if main.active_piece_type != "none":
-			texture_rect.texture = main.textures[main.active_piece_type]
-			texture_rect.visible = true
-			texture_rect.modulate.a = preview_opacity
+			# Show piece preview
+			if !occupied_squares[grid_pos]:
+				var texture_rect = square.get_node("ColorRect/ContentTextureRect")
+				texture_rect.texture = main.textures[main.active_piece_type]
+				texture_rect.visible = true
+				texture_rect.modulate.a = preview_opacity
+			
+			# Show move highlights
+			var moves = main.get_moves(main.active_piece_type, grid_pos)
+			highlight_squares(moves)
 
 func _on_button_mouse_exited(grid_pos: Vector2):
 	var square = get_square(grid_pos)
@@ -64,3 +88,5 @@ func _on_button_mouse_exited(grid_pos: Vector2):
 		var texture_rect = square.get_node("ColorRect/ContentTextureRect")
 		texture_rect.texture = null
 		texture_rect.visible = false
+		texture_rect.modulate.a = 1
+	clear_highlights()
