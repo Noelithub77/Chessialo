@@ -31,12 +31,12 @@ var available_pieces : Dictionary = {
 }
 
 var textures : Dictionary = {
-	"knight": preload("res://assets/BKnight.svg"),
-	"rook": preload("res://assets/BRook.svg"),
-	"bishop": preload("res://assets/BBishop.svg"),
-	"queen": preload("res://assets/BQueen.svg"),
-	"king": preload("res://assets/BKing.svg"),
-	"pawn": preload("res://assets/BPawn.svg"),
+	"knight": preload("res://assets/WKnight.svg"),
+	"rook": preload("res://assets/WRook.svg"),
+	"bishop": preload("res://assets/WBishop.svg"),
+	"queen": preload("res://assets/WQueen.svg"),
+	"king": preload("res://assets/WKing.svg"),
+	"pawn": preload("res://assets/WPawn.svg"),
 }
 
 func _ready() -> void:
