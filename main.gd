@@ -11,7 +11,7 @@ var enemy_count : int = 15
 var score : int = 0
 const BOARD_SIZE : int = 8
 const FLASH_DURATION : float = 0.2
-const RESPAWN_DELAY : float = 0.5
+const RESPAWN_DELAY : float = 0.3
 
 var piece_types : Dictionary = {
 	"k" : "knight",
@@ -64,10 +64,11 @@ func spawn_enemy(should_flash: bool = true) -> void:
 	content.texture = enemy_texture
 	content.visible = true
 	board.occupied_squares[random_pos] = true
+	board.occupied_by_piece[random_pos] = "enemy"
 
 func _flash_square(color_rect: ColorRect) -> void:
 	var original_color = color_rect.color
-	color_rect.color = Color(1, 0, 0, 0.7)
+	color_rect.color = Color("#12f2c9b3") 
 	await get_tree().create_timer(FLASH_DURATION).timeout
 	color_rect.color = original_color
 
@@ -89,6 +90,16 @@ func get_piece() -> void:
 		if Input.is_action_just_pressed(key):
 			var piece_name = piece_types[key]
 			if piece_name in available_pieces and available_pieces[piece_name] > 0:
+				# Remove previous piece if it exists
+				for piece in player_pieces:
+					var square = board.get_square(piece.pos)
+					var content = square.get_node("ColorRect/ContentTextureRect")
+					content.texture = null
+					content.visible = false
+					board.occupied_squares[piece.pos] = false
+					board.occupied_by_piece[piece.pos] = "none"
+				player_pieces.clear()
+				
 				active_piece_type = piece_name
 				$SelectedPiece.text = "Selected Piece: " + active_piece_type
 			else:
@@ -98,6 +109,7 @@ func _on_piece_unavailable(piece_name: String) -> void:
 	var popup = Popup.new()
 	var label = Label.new()
 	label.text = piece_name + " not available"
+	label.add_theme_font_size_override("font_size", 70)  # Increased font size
 	popup.add_child(label)
 	add_child(popup)
 	popup.popup_centered()
@@ -113,7 +125,7 @@ func _on_square_clicked(grid_pos: Vector2) -> void:
 func place_piece(grid_pos: Vector2) -> void:
 	if board.occupied_squares.get(grid_pos, false):
 		return
-		
+	
 	var square = board.get_square(grid_pos)
 	var content = square.get_node("ColorRect/ContentTextureRect")
 	content.texture = textures[active_piece_type]
@@ -121,6 +133,7 @@ func place_piece(grid_pos: Vector2) -> void:
 	
 	player_pieces.append({"type": active_piece_type, "pos": grid_pos})
 	board.occupied_squares[grid_pos] = true
+	board.occupied_by_piece[grid_pos] = "player"
 	available_pieces[active_piece_type] -= 1
 	
 	$Available.text = str(available_pieces)
@@ -132,30 +145,50 @@ func place_piece(grid_pos: Vector2) -> void:
 func check_kills() -> void:
 	var killed_positions = _get_killed_positions()
 	
+	if killed_positions.is_empty():
+		return
+		
+	# Handle all kills at once
 	for pos in killed_positions:
-		await _handle_kill(pos)
+		var square = board.get_square(pos)
+		var content = square.get_node("ColorRect/ContentTextureRect")
+		content.texture = null
+		content.visible = false
+		board.occupied_squares[pos] = false
+		score += 1
+	
+	$ScoreLabel.text = "Score: " + str(score)
+	
+	# Wait a moment before respawning
+	await get_tree().create_timer(RESPAWN_DELAY).timeout
+	
+	# Respawn enemies until we're back to enemy_count
+	var current_enemies = count_enemies()
+	var enemies_to_spawn = enemy_count - current_enemies
+	
+	for i in enemies_to_spawn:
+		spawn_enemy(true)
+		# Add a small delay between spawns
+		await get_tree().create_timer(0.1).timeout
+
+func count_enemies() -> int:
+	var count = 0
+	for pos in board.occupied_squares:
+		if board.occupied_squares[pos]:
+			var square = board.get_square(pos)
+			var content = square.get_node("ColorRect/ContentTextureRect")
+			if content.texture == enemy_texture:
+				count += 1
+	return count
 
 func _get_killed_positions() -> Array:
 	var killed = []
 	for piece in player_pieces:
 		var kills = get_moves(piece.type, piece.pos)
 		for pos in kills:
-			if board.occupied_squares.get(pos, false):
+			if board.occupied_squares.get(pos, false) and board.occupied_by_piece[pos] == "enemy":
 				killed.append(pos)
 	return killed
-
-func _handle_kill(pos: Vector2) -> void:
-	var square = board.get_square(pos)
-	var content = square.get_node("ColorRect/ContentTextureRect")
-	content.texture = null
-	content.visible = false
-	
-	board.occupied_squares[pos] = false
-	score += 1
-	$ScoreLabel.text = "Score: " + str(score)
-	
-	await get_tree().create_timer(RESPAWN_DELAY).timeout
-	spawn_enemy(true)  # Show flash effect during respawn
 
 func get_moves(piece_type : String, grid_position : Vector2) -> Array[Vector2]:
 	match piece_type:
