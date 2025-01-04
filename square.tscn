@@ -1,6 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dfs6hxmk5w8at"]
-
-[ext_resource type="Script" path="res://button.gd" id="2_q2bt3"]
+[gd_scene format=3 uid="uid://dfs6hxmk5w8at"]
 
 [node name="Square" type="Node2D"]
 
@@ -31,7 +29,6 @@ theme_override_colors/font_pressed_color = Color(0.663739, 0.734061, 0.0909931, 
 theme_override_colors/icon_hover_color = Color(0.675645, 0.694294, 0.118244, 1)
 theme_override_colors/icon_hover_pressed_color = Color(0.679678, 0.671079, 0.159453, 1)
 action_mode = 0
-script = ExtResource("2_q2bt3")
 
 [node name="ContentTextureRect" type="TextureRect" parent="ColorRect"]
 layout_mode = 1
