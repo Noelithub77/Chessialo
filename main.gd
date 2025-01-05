@@ -26,8 +26,8 @@ var available_pieces : Dictionary = {
 	"rook": 2,
 	"bishop": 2,
 	"queen": 1,
-	"king": 1,
-	"pawn": 8,
+	# "king": 1,
+	"pawn": 4,
 }
 
 var textures : Dictionary = {
@@ -39,7 +39,20 @@ var textures : Dictionary = {
 	"pawn": preload("res://assets/WPawn.svg"),
 }
 
+var flashing_squares = {}
+
+var game_seed: int 
+
+var rng: RandomNumberGenerator
+
 func _ready() -> void:
+	rng = RandomNumberGenerator.new()
+	game_seed = GameState.current_seed
+	rng.seed = game_seed
+	$"seed".text = str(game_seed)
+	$"seed".text_submitted.connect(_on_seed_submitted)
+	$ResetButton.pressed.connect(_on_reset_pressed)
+	
 	player_pieces.clear()
 	board.square_clicked.connect(_on_square_clicked)
 	piece_unavailable.connect(_on_piece_unavailable)
@@ -47,17 +60,34 @@ func _ready() -> void:
 	for i in enemy_count:
 		spawn_enemy(false)  # Don't flash during initial spawn
 
+	update_score_history()
+
+func set_seed(new_seed: int) -> void:
+	game_seed = new_seed
+	GameState.current_seed = new_seed
+	rng.seed = game_seed
+
+func _on_seed_submitted(new_seed) -> void:
+	if new_seed.is_valid_int():
+		print("reached to int, seed on signal submit :"+ str(game_seed))
+		set_seed(new_seed.to_int())
+		get_tree().reload_current_scene()
+		print("just after reload:"+str(game_seed))
+	else:
+		$"seed".text = str(game_seed)
+
 func spawn_enemy(should_flash: bool = true) -> void:
 	var empty_positions = _get_empty_positions()
 	if empty_positions.is_empty():
 		return
 		
-	var random_pos = empty_positions[randi() % empty_positions.size()]
+	var random_pos = empty_positions[rng.randi() % empty_positions.size()]
 	var square = board.get_square(random_pos)
 	var color_rect = square.get_node("ColorRect")
 	
 	# Flash effect only when respawning
 	if should_flash:
+		_cleanup_flashing_squares() # Clean up any existing flashes
 		await _flash_square(color_rect)
 	
 	var content = square.get_node("ColorRect/ContentTextureRect")
@@ -68,9 +98,18 @@ func spawn_enemy(should_flash: bool = true) -> void:
 
 func _flash_square(color_rect: ColorRect) -> void:
 	var original_color = color_rect.color
+	flashing_squares[color_rect] = original_color
 	color_rect.color = Color("#12f2c9b3") 
 	await get_tree().create_timer(FLASH_DURATION).timeout
-	color_rect.color = original_color
+	# Only reset if it's still flashing (hasn't been changed by something else)
+	if color_rect in flashing_squares:
+		color_rect.color = original_color
+		flashing_squares.erase(color_rect)
+
+func _cleanup_flashing_squares() -> void:
+	for color_rect in flashing_squares:
+		color_rect.color = flashing_squares[color_rect]
+	flashing_squares.clear()
 
 func _get_empty_positions() -> Array:
 	var empty = []
@@ -290,3 +329,15 @@ func get_pawn_moves(grid_position : Vector2) -> Array[Vector2]:
 	if new_pos.x >= 0 and new_pos.x < 8 and new_pos.y >= 0 and new_pos.y < 8:
 		moves.append(new_pos)
 	return moves
+
+
+func get_current_seed() -> int:
+	return game_seed
+
+func _on_reset_pressed() -> void:
+	GameState.score_history.append(score)
+	get_tree().reload_current_scene()
+
+func update_score_history() -> void:
+	var score_history = GameState.score_history
+	$ScoreHistoryLabel.text = "Score History: " + str(score_history)

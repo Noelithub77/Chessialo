@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://vuavb6iox63y"]
+[gd_scene load_steps=6 format=3 uid="uid://vuavb6iox63y"]
 
 [ext_resource type="Script" path="res://board.gd" id="1_fojx7"]
 [ext_resource type="Script" path="res://main.gd" id="1_i5bht"]
 [ext_resource type="Texture2D" uid="uid://1sql4pmy32c8" path="res://assets/BPawn.svg" id="2_786bw"]
 [ext_resource type="PackedScene" uid="uid://dfs6hxmk5w8at" path="res://square.tscn" id="2_w34se"]
+[ext_resource type="Texture2D" uid="uid://do00ckqtqaisd" path="res://refresh.png" id="5_r78mt"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("board")]
 script = ExtResource("1_i5bht")
@@ -19,8 +20,8 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 700.0
 offset_top = 355.0
-offset_right = 2235.0
-offset_bottom = 1891.0
+offset_right = 1212.0
+offset_bottom = 867.0
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(3, 3)
@@ -35,22 +36,38 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 1017.0
-offset_top = -6.0
-offset_right = 1167.0
-offset_bottom = 34.0
+offset_left = 1265.0
+offset_top = -18.0
+offset_right = 1507.0
+offset_bottom = 65.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(4, 4)
+theme_override_font_sizes/font_size = 60
 text = "Score : 0"
 horizontal_alignment = 1
+
+[node name="ScoreHistoryLabel" type="Label" parent="."]
+layout_direction = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 2317.0
+offset_top = 359.0
+offset_right = 2718.0
+offset_bottom = 442.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "Score History:"
 
 [node name="SelectedPiece" type="Label" parent="."]
 offset_left = 2161.0
 offset_top = -1.0
 offset_right = 2329.0
 offset_bottom = 24.0
-scale = Vector2(4, 4)
+theme_override_font_sizes/font_size = 60
 text = "Selected Piece: none"
 
 [node name="Available" type="Label" parent="."]
@@ -58,10 +75,32 @@ offset_left = 17.0
 offset_top = 98.0
 offset_right = 106.0
 offset_bottom = 251.0
-scale = Vector2(4, 4)
+theme_override_font_sizes/font_size = 60
 text = "\"knight\": 2,
 \"rook\": 2,
 \"bishop\": 2,
 \"queen\": 2,
-\"king\": 1,
-	\"pawn\": 8"
+\"pawn\": 8"
+
+[node name="SeedLabel" type="Label" parent="."]
+offset_right = 150.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 60
+text = "Seed:"
+
+[node name="seed" type="LineEdit" parent="."]
+offset_left = 160.0
+offset_right = 400.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 60
+placeholder_text = "Enter number"
+
+[node name="ResetButton" type="Button" parent="."]
+offset_left = 2365.0
+offset_top = 122.0
+offset_right = 2885.0
+offset_bottom = 642.0
+scale = Vector2(0.4, 0.4)
+theme_override_font_sizes/font_size = 60
+icon = ExtResource("5_r78mt")
+icon_alignment = 1
