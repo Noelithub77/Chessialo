@@ -45,6 +45,9 @@ var game_seed: int
 
 var rng: RandomNumberGenerator
 
+var elapsed_time: float = 0.0
+var stopwatch_active: bool = false
+
 func _ready() -> void:
 	rng = RandomNumberGenerator.new()
 	game_seed = GameState.current_seed
@@ -60,7 +63,8 @@ func _ready() -> void:
 	for i in enemy_count:
 		spawn_enemy(false)  # Don't flash during initial spawn
 
-	update_score_history()
+	update_score_and_time_history()
+	stopwatch_active = true
 
 func set_seed(new_seed: int) -> void:
 	game_seed = new_seed
@@ -120,9 +124,17 @@ func _get_empty_positions() -> Array:
 				empty.append(pos)
 	return empty
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if stopwatch_active:
+		elapsed_time += delta
+		update_stopwatch_display()
 	if Input.is_action_just_pressed("use_piece"):
 		get_piece()
+
+func update_stopwatch_display() -> void:
+	var minutes = int(elapsed_time / 60)
+	var seconds = int(elapsed_time) % 60
+	$StopwatchLabel.text = "Time: %d:%02d" % [minutes, seconds]
 
 func get_piece() -> void:
 	for key in piece_types:
@@ -142,7 +154,9 @@ func get_piece() -> void:
 				active_piece_type = piece_name
 				$SelectedPiece.text = "Selected Piece: " + active_piece_type
 			else:
-				piece_unavailable.emit(piece_name)
+				var is_game_over = await check_game_over()
+				if not is_game_over:
+					piece_unavailable.emit(piece_name)
 
 func _on_piece_unavailable(piece_name: String) -> void:
 	var popup = Popup.new()
@@ -336,8 +350,25 @@ func get_current_seed() -> int:
 
 func _on_reset_pressed() -> void:
 	GameState.score_history.append(score)
+	GameState.time_history.append(elapsed_time)
 	get_tree().reload_current_scene()
 
-func update_score_history() -> void:
+func update_score_and_time_history() -> void:
 	var score_history = GameState.score_history
-	$ScoreHistoryLabel.text = "Score History: " + str(score_history)
+	var time_history = GameState.time_history
+	var history_text = "History:\n"
+	for i in range(score_history.size()):
+		var minutes = int(time_history[i] / 60)
+		var seconds = int(time_history[i]) % 60
+		history_text += "Score: %d - Time: %d:%02d\n" % [score_history[i], minutes, seconds]
+	$ScoreHistoryLabel.text = history_text
+
+func check_game_over() -> bool:
+	for piece_name in available_pieces:
+		if available_pieces[piece_name] > 0:
+			return false
+	stopwatch_active = false
+	$GameOverPopup.popup_centered()
+	await get_tree().create_timer(1.0).timeout
+	_on_reset_pressed()
+	return true

@@ -46,6 +46,16 @@ theme_override_font_sizes/font_size = 60
 text = "Score : 0"
 horizontal_alignment = 1
 
+[node name="StopwatchLabel" type="Label" parent="."]
+layout_direction = 1
+offset_left = 1251.0
+offset_top = 61.0
+offset_right = 1545.0
+offset_bottom = 144.0
+theme_override_font_sizes/font_size = 60
+text = "Time: 0:00"
+horizontal_alignment = 1
+
 [node name="ScoreHistoryLabel" type="Label" parent="."]
 layout_direction = 1
 anchors_preset = 8
@@ -54,9 +64,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 2317.0
-offset_top = 359.0
+offset_top = 501.0
 offset_right = 2718.0
-offset_bottom = 442.0
+offset_bottom = 584.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 60
@@ -72,9 +82,9 @@ text = "Selected Piece: none"
 
 [node name="Available" type="Label" parent="."]
 offset_left = 17.0
-offset_top = 98.0
-offset_right = 106.0
-offset_bottom = 251.0
+offset_top = 159.0
+offset_right = 347.0
+offset_bottom = 586.0
 theme_override_font_sizes/font_size = 60
 text = "\"knight\": 2,
 \"rook\": 2,
@@ -104,3 +114,16 @@ scale = Vector2(0.4, 0.4)
 theme_override_font_sizes/font_size = 60
 icon = ExtResource("5_r78mt")
 icon_alignment = 1
+
+[node name="GameOverPopup" type="Popup" parent="."]
+
+[node name="GameOverLabel" type="Label" parent="GameOverPopup"]
+layout_direction = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "Game Over!"
+horizontal_alignment = 1

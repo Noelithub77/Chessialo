@@ -1,4 +1,5 @@
 extends Node
 
-@export var current_seed: int
-@export var score_history: Array = []
+var current_seed: int 
+var score_history: Array = []
+var time_history: Array = []
