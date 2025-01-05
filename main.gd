@@ -61,7 +61,7 @@ func _ready() -> void:
 	piece_unavailable.connect(_on_piece_unavailable)
 	
 	for i in enemy_count:
-		spawn_enemy(false)  # Don't flash during initial spawn
+		spawn_enemy(false)  
 
 	update_score_and_time_history()
 	stopwatch_active = true
@@ -89,9 +89,9 @@ func spawn_enemy(should_flash: bool = true) -> void:
 	var square = board.get_square(random_pos)
 	var color_rect = square.get_node("ColorRect")
 	
-	# Flash effect only when respawning
+	
 	if should_flash:
-		_cleanup_flashing_squares() # Clean up any existing flashes
+		_cleanup_flashing_squares() 
 		await _flash_square(color_rect)
 	
 	var content = square.get_node("ColorRect/ContentTextureRect")
@@ -105,7 +105,7 @@ func _flash_square(color_rect: ColorRect) -> void:
 	flashing_squares[color_rect] = original_color
 	color_rect.color = Color("#12f2c9b3") 
 	await get_tree().create_timer(FLASH_DURATION).timeout
-	# Only reset if it's still flashing (hasn't been changed by something else)
+	
 	if color_rect in flashing_squares:
 		color_rect.color = original_color
 		flashing_squares.erase(color_rect)
@@ -332,10 +332,9 @@ func get_pawn_moves(grid_position : Vector2) -> Array[Vector2]:
 	var new_pos = grid_position + Vector2(0,move_direction)
 	if new_pos.x >= 0 and new_pos.x < 8 and new_pos.y >= 0 and new_pos.y < 8:
 		moves.append(new_pos)
-		if grid_position.y == (4 + move_direction):
-			new_pos = grid_position + Vector2(0,move_direction*2)
-			if new_pos.x >= 0 and new_pos.x < 8 and new_pos.y >= 0 and new_pos.y < 8:
-				moves.append(new_pos)
+		new_pos = grid_position + Vector2(0,move_direction*2)
+		if new_pos.x >= 0 and new_pos.x < 8 and new_pos.y >= 0 and new_pos.y < 8:
+			moves.append(new_pos)
 	new_pos = grid_position + Vector2(1,move_direction)
 	if new_pos.x >= 0 and new_pos.x < 8 and new_pos.y >= 0 and new_pos.y < 8:
 		moves.append(new_pos)
